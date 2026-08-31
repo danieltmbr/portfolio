@@ -116,7 +116,7 @@
             </div>
 
             <p>
-                Smoothing the signal too aggressively can remove not only anomalies but also meaningful characteristics of the run. The aim is therefore to reduce distracting short-term noise while preserving changes that matter to the final visualisation.
+            The goal of signal analysis is not simply to make the data visually cleaner. The amount of smoothing is determined by the intended output: a long physical activity compressed into a short animation. Different interpolation and filtering configurations can produce very different visual behaviours. Smoothing the signal too aggressively can remove not only anomalies but also meaningful characteristics of the run. The aim is therefore to reduce distracting short-term noise while preserving changes that matter to the final visualisation.
             </p>
 
             <div class="media-grid">
@@ -135,10 +135,6 @@
             </p>
 
             <h3>Perception engine</h3>
-
-            <p>
-                The goal of signal analysis is not simply to make the data visually cleaner. The amount of smoothing is determined by the intended output: a long physical activity compressed into a short animation. Different interpolation and filtering configurations can produce very different visual behaviours.
-            </p>
 
             <p>
                 A typical run may last from several minutes to several hours, while the final visualisation is intended to be around <strong>15–60 seconds long</strong>. Directly mapping raw sample-to-sample changes into animation parameters would therefore exaggerate short-term fluctuations. Even an easy, steady run could produce rapid, flashy, and visually unstable motion. The processed signal should avoid this while preserving meaningful transitions once the run is compressed in time.
