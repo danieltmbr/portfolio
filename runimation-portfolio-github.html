@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Daniel Tombor - r u n i</title>
+    <style>
+        html {
+            margin: 2em;
+        }
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+            margin: 1em 0;
+        }
+
+        .media-grid figure {
+            margin: 0;
+        }
+        
+        figure {
+            background: #f9f9f9;
+            border-radius: 10px;
+        }
+
+        img,
+        video {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        figure > video {
+            border-radius: 10px 10px 0 0;
+        }
+        
+        figcaption {
+            font-size: 92%;
+            font-style: italic;
+            opacity: 0.9;
+            padding: 0em 1.5em 1em 1.5em;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Portfolio of Daniel Tombor</h1>
+        <h2>r u n i - translating the experience of running into generative form</h2>
+        <p>An ongoing computational design investigation by Daniel Tombor</p>
+
+        <p>
+            This project documents my approach, learning, and progress so far in trying to capture the human experience of running and transform it into art.
+        </p>
+
+        <figure>
+            <video src="resources/warping.mp4" autoplay muted loop playsinline controls>
+                Your browser does not support the video element.
+            </video>
+            <figcaption>Video of a generative warped noise field animated based on a run's metrics.</figcaption>
+        </figure>
+    </header>
+
+    <main>
+        <section>
+            <h2>Analysis</h2>
+
+            <h3>Filtering and interpolation</h3>
+
+            <p>
+                A recorded run usually contains GPS coordinates, elevation, heart rate (HR), and cadence values with timestamps.
+            </p>
+
+            <p>
+                These measurements, collected by wearable devices or smartphones, are often noisy and can contain anomalies caused by poor satellite reception, urban environments, tunnels, tree cover, or temporary signal loss. These anomalies can appear as spikes or drops in graphs and as sudden jumps or flashes in animations, so they need to be reduced before the data can reliably drive a visual system.
+            </p>
+
+            <p>
+                As an initial exploration, I compared different approaches to reconstructing and smoothing the signal. Catmull–Rom interpolation was used to generate continuous values between samples, while Gaussian smoothing and moving averages were tested as filtering methods for reducing short-term noise and spikes.
+            </p>
+
+            <div class="media-grid">
+                <figure>
+                    <img src="resources/signals-raw.png" alt="Unfiltered raw GPS data with linear interpolation" />
+                    <figcaption>Unfiltered raw GPS data with linear interpolation</figcaption>
+                </figure>
+                <figure>
+                    <img src="resources/signals-catmullrom.png" alt="Catmull–Rom interpolation of the signal" />
+                    <figcaption>Catmull–Rom interpolation of the signal</figcaption>
+                </figure>
+            </div>
+            
+            <div class="media-grid">
+                <figure>
+                    <img src="resources/signals-wave-sample.png" alt="Wave sampling of the signal" />
+                    <figcaption>Wave sampling of the signal</figcaption>
+                </figure>
+                <figure>
+                    <img src="resources/signals-guassian.png" alt="Gaussian smoothing of the signal" />
+                    <figcaption>Gaussian smoothing of the signal</figcaption>
+                </figure>
+            </div>
+
+            <div class="media-grid">
+                <figure>
+                    <video src="resources/animation-raw.mp4" controls playsinline>
+                        Your browser does not support the video element.
+                    </video>
+                    <figcaption>Animation driven by unprocessed raw GPS data</figcaption>
+                </figure>
+                <figure>
+                    <video src="resources/animation-guassian.mp4" controls playsinline>
+                        Your browser does not support the video element.
+                    </video>
+                    <figcaption>Animation driven by Gaussian-filtered GPS data</figcaption>
+                </figure>
+            </div>
+
+            <p>
+                Smoothing the signal too aggressively can remove not only anomalies but also meaningful characteristics of the run. The aim is therefore to reduce distracting short-term noise while preserving changes that matter to the final visualisation.
+            </p>
+
+            <div class="media-grid">
+                <figure>
+                    <img src="resources/signals-guassian.png" alt="Gaussian smoothing used to reduce spikes" />
+                    <figcaption>Gaussian smoothing used to reduce spikes</figcaption>
+                </figure>
+                <figure>
+                    <img src="resources/signals-guassian-over.png" alt="Over-smoothed Gaussian signal that removes meaningful characteristics of the run" />
+                    <figcaption>Over-smoothed Gaussian signal that removes meaningful characteristics of the run</figcaption>
+                </figure>
+            </div>
+
+            <p>
+                The current filtering pipeline is sufficient for proof-of-concept visualisations, while more sophisticated approaches remain an area for further investigation. One future direction is to evaluate methods such as Kalman filtering and compare how effectively they preserve meaningful behaviour while suppressing measurement noise.
+            </p>
+
+            <h3>Perception engine</h3>
+
+            <p>
+                The goal of signal analysis is not simply to make the data visually cleaner. The amount of smoothing is determined by the intended output: a long physical activity compressed into a short animation. Different interpolation and filtering configurations can produce very different visual behaviours.
+            </p>
+
+            <p>
+                A typical run may last from several minutes to several hours, while the final visualisation is intended to be around <strong>15–60 seconds long</strong>. Directly mapping raw sample-to-sample changes into animation parameters would therefore exaggerate short-term fluctuations. Even an easy, steady run could produce rapid, flashy, and visually unstable motion. The processed signal should avoid this while preserving meaningful transitions once the run is compressed in time.
+            </p>
+
+            <p>
+                The next stage of the project investigates a higher-level abstraction. Individual measurements such as pace, heart rate, cadence, elevation, and direction are not themselves the experience of running. The aim is to combine and transform these signals into longer, more coherent perceptual segments.
+            </p>
+
+            <div class="media-grid">
+                <figure>
+                    <img src="resources/perception-engine.png" alt="Perception engine run segmentation experiment with segments via the algorithm and segments marked by hand." />
+                    <figcaption>Perception engine run segmentation experiment. Magenta background shows the segmentation by the engine, red vertical lines shows how I'd separate them manually.</figcaption>
+                </figure>
+            </div>
+
+            <p>
+                The purpose of the perception engine is not to classify a run into rigid labels, but to create a smoother intermediate representation that can drive the visual system.
+            </p>
+
+            <h3>Processing pipeline</h3>
+
+            <p>The longer-term goal is to develop the processing pipeline approximately as follows:</p>
+
+            <pre>Raw measurements
+↓
+Filtering — anomaly removal
+↓
+Interpolation / smoothing
+↓
+Perceptual segments
+↓
+Generative parameters
+↓
+Animation</pre>
+
+            <p>
+                The current investigation focuses on how multiple signals can be combined into temporally coherent segments so that the animation responds to the broader character of the run rather than reacting mechanically to individual measurements. The experiments so far have not yet produced sufficiently coherent segmentation, making this one of the project's main open research questions. An alternative approach I would like to explore is manually classifying selected runs and using those examples to train a model for future segmentation.
+            </p>
+        </section>
+
+        <section>
+            <h2>Synthesis</h2>
+
+            <p>
+                Once the input signal is stable enough, the next question is how to translate it into expressive visual behaviour.
+            </p>
+
+            <h3>Generative visual vocabulary</h3>
+
+            <p>
+                I began exploring procedural graphics techniques that can produce continuous, organic motion while remaining fully parameterised. Following several of Inigo Quilez's articles, I experimented with pseudo-random continuous fields as a basis for generating visual motion.
+            </p>
+
+            <p>
+                A fundamental building block is gradient noise, where the interpolation between pseudo-random values must be chosen carefully to avoid visible friction in the animation caused by discontinuous first derivatives. In his <a href="https://iquilezles.org/articles/gradientnoise/">gradient noise article</a>, Inigo Quilez demonstrates polynomial interpolation functions that produce smoother gradients.
+            </p>
+
+            <div class="media-grid">
+                <figure>
+                    <img src="resources/gradient-noise-linear.png" alt="Gradient noise with linear interpolation" />
+                    <figcaption>Gradient noise with linear interpolation</figcaption>
+                </figure>
+                <figure>
+                    <img src="resources/gradient-noise-polynomial.png" alt="Gradient noise with polynomial interpolation" />
+                    <figcaption>Gradient noise with polynomial interpolation</figcaption>
+                </figure>
+            </div>
+
+            <p>
+                <a href="https://iquilezles.org/articles/fbm/">Fractal Brownian Motion</a> builds on noise by combining several layers at different frequencies. This produces richer structures with detail at multiple scales. Changing frequency, amplitude, octave count, and persistence affects the perceived energy and complexity of the visual field.
+            </p>
+
+            <div class="media-grid">
+                <figure>
+                    <img src="resources/fbm-smooth.png" alt="Fractal Brownian Motion with fewer octaves and lower frequency" />
+                    <figcaption>Fractal Brownian Motion with fewer octaves and lower frequency</figcaption>
+                </figure>
+                <figure>
+                    <img src="resources/fbm-detailed.png" alt="Fractal Brownian Motion with more octaves and higher frequency" />
+                    <figcaption>Fractal Brownian Motion with more octaves and higher frequency</figcaption>
+                </figure>
+            </div>
+
+            <p>
+                The next step was using domain warping to distort the coordinates used to sample another procedural field. Instead of adding detail directly, domain warping bends and reshapes the underlying space. Connecting different running metrics to the warping, for example speed to amplitude, HR to octave count, and direction to sampling displacement, became particularly interesting because distortion itself could be used as a visual representation of effort, instability, or changing perception
+                during a run.
+            </p>
+
+            <div class="media-grid">
+                <figure>
+                    <img src="resources/warping-smooth.png" alt="Domain warping with fewer octaves and lower frequency" />
+                    <figcaption>Domain warping with fewer octaves and lower frequency</figcaption>
+                </figure>
+                <figure>
+                    <img src="resources/warping-detailed.png" alt="Domain warping with more octaves and higher frequency" />
+                    <figcaption>Domain warping with more octaves and higher frequency</figcaption>
+                </figure>
+            </div>
+
+            <figure>
+                <video src="resources/warping.mp4" controls playsinline>
+                    Your browser does not support the video element.
+                </video>
+                <figcaption>Domain warping animation driven by run metrics: speed → amplitude, HR → octaves, direction → sampling displacement</figcaption>
+            </figure>
+
+            <p>
+                Although I found these visuals aesthetically pleasing and knew that their behaviour was driven by the run, the connection remained too abstract to perceive intuitively. This led me to explore simpler representations that retain some abstraction while making their relationship to the activity easier to grasp.
+            </p>
+
+            <h3>Distorting geographic space</h3>
+
+            <p>
+                To make the visualisation more immediately relatable, I applied domain warping to one of the most recognisable representations of a run: the route itself. A running map tells us where the athlete went, but not what the journey felt like. The experiment investigates whether the route can become part of the expressive visual system rather than remaining a neutral geographic trace.
+            </p>
+
+            <figure>
+                <video src="resources/path-warping.mp4" controls playsinline>
+                    Your browser does not support the video element.
+                </video>
+                <figcaption>Domain warping applied to the run route to express more than just location</figcaption>
+            </figure>
+
+            <p>
+                Because the geographic information remains recognisable, the visualisation is easier to relate to. At the same time, the distortion becomes more meaningful because I can associate particular deformations with specific parts of the run.
+            </p>
+        </section>
+
+        <section>
+            <h2>Emerging botanical forms</h2>
+
+            <p>
+                I would like to find a balance between representations that are highly abstract, such as a distorted noise field, and those that are immediately obvious, such as a distorted run path. A blooming flower or developing plant offers a possible middle ground.
+            </p>
+
+            <p>
+                It grows and changes over time; it can reach its prime, or go beyond it and wilt or wither. In a similar way, a run can unfold according to plan, exceed its intended effort, deteriorate, or even be abandoned. A blooming flower is particularly interesting because it naturally contains growth, repetition, variation, hierarchy, symmetry and asymmetry, and temporal development. A single generative system could therefore produce a large number of unique, personalised animations while still providing a recognisable visual metaphor.
+            </p>
+
+            <p>
+                This led to an investigation of procedural flower construction using <strong>Signed Distance Fields (SDFs)</strong> and fragment shaders.
+            </p>
+
+            <h3>Cherry blossom study</h3>
+
+            <p>
+                The cherry blossom experiment investigates how a flower can be constructed from a small number of parameterised geometric and procedural rules. The system developed through several stages: from the base two-dimensional petal geometry, through surface-elevation maps and shadow casting, to pseudo-random variation, venation, and finer structural detail.
+            </p>
+
+            <h4>Petal geometry and surface development</h4>
+
+            <div class="media-grid">
+                <figure>
+                    <img src="resources/sdf-petal-single.png" alt="Single-petal SDF implementation" />
+                    <figcaption>Single-petal SDF implementation</figcaption>
+                </figure>
+                <figure>
+                    <img src="resources/sdf-petal-multi.png" alt="Multiple petals using SDF domain repetition" />
+                    <figcaption>Multiple petals using SDF domain repetition</figcaption>
+                </figure>
+                <figure>
+                    <img src="resources/sdf-petal-overlap.png" alt="Colour mixing of overlapping petals" />
+                    <figcaption>Colour mixing of overlapping petals</figcaption>
+                </figure>
+                <figure>
+                    <img src="resources/sdf-petal-elevation.png" alt="Petal elevation map used for lighting and shadowing" />
+                    <figcaption>Petal elevation map used for lighting and shadowing</figcaption>
+                </figure>
+                <figure>
+                    <img src="resources/sdf-petal-occlusion.png" alt="Petal occlusion and shadow experiment" />
+                    <figcaption>Petal occlusion and shadow experiment</figcaption>
+                </figure>
+                <figure>
+                    <img src="resources/sdf-petal-variation.png" alt="Petals with procedural edge irregularity" />
+                    <figcaption>Petals with procedural edge irregularity</figcaption>
+                </figure>
+            </div>
+
+            <p>
+                Rather than modelling a flower manually, the goal is to understand how increasingly complex botanical structure can emerge from reusable computational rules. This investigation is still at an early stage, with several open questions:
+            </p>
+
+            <ul>
+                <li>How should petals change during growth?</li>
+                <li>How can venation follow the material structure of a petal?</li>
+                <li>How can local variation create natural irregularity without destroying the underlying form?</li>
+                <li>How might running data influence the growth, motion, or appearance of the flower?</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Hungarian Kalocsai ornament as a generative system</h2>
+
+            <p>
+                The next investigation moves from natural botanical form to a cultural interpretation of flowers. Traditional <strong>Kalocsai embroidery</strong> uses stylised flowers, leaves, branches, repetition, colour, and ornamental hierarchy. The individual flower motifs are comparatively simple to represent using SDFs; the more interesting challenge is how to generate the larger ornamental composition, including branching, placement, and overlap.
+            </p>
+
+            <div class="media-grid">
+                <figure>
+                    <img src="resources/kalocsai-pattern-embroidery.jpg" alt="Reference image of Kalocsai patterns embroidery" />
+                    <figcaption>Kalocsai pattern embroidery</figcaption>
+                </figure>
+                <figure>
+                    <img src="resources/kalocsai-pattern-reference.jpg" alt="Reference image of Kalocsai patterns as digital illustration" />
+                    <figcaption><a href="https://www.alamy.com/stock-photo-hungarian-floral-folk-pattern-kalocsai-embroidery-with-flowers-and-134058370.html">Digital illustration</a> of Kalocsai pattern</figcaption>
+                </figure>
+                <figure>
+                    <img src="resources/sdf-kalocsai-motifs.png" alt="SDF implementation of Kalocsai motifs" />
+                    <figcaption>My SDF implementation of Kalocsai motifs</figcaption>
+                </figure>
+            </div>
+
+            <p>
+                I am exploring whether this visual language can be represented as a parameterised generative system rather than as a fixed illustration, where the overall ornament can follow the run path and motifs can emerge as the run progresses. The aim is to develop reusable elements arranged through rules governing branching, scale, orientation, hierarchy, repetition, and flower and leaf distribution.
+            </p>
+
+            <p>
+                So far, I have implemented several individual motifs and am investigating algorithms for generating the branching ornamental arrangement.
+            </p>
+
+            <p>The longer-term idea is for properties of the run to influence the composition:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Running property</th>
+                        <th>Possible visual influence</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Intensity</td><td>Flower size or visual density</td></tr>
+                    <tr><td>Direction</td><td>Orientation of branches, leaves, or flowers</td></tr>
+                    <tr><td>Perceptual segments</td><td>Changes in motif type or complexity</td></tr>
+                    <tr><td>Route geometry</td><td>Overall ornamental composition</td></tr>
+                    <tr><td>Individual run identity</td><td>Seed for deterministic variation</td></tr>
+                </tbody>
+            </table>
+
+            <p>
+                This would allow every run to generate a unique pattern while incorporating a visual language connected to Hungarian cultural heritage.
+            </p>
+        </section>
+
+        <section>
+            <h2>Current direction</h2>
+
+            <p>
+                The project currently sits between signal processing, procedural computer graphics, computational design, and artistic research. The individual experiments are intentionally exploratory. My goal is not only to create a finished running application, but to better understand the systems connecting:
+            </p>
+
+            <pre>Physical activity
+↓
+Measured data
+↓
+Signal transformation
+↓
+Perceptual abstraction
+↓
+Generative rules
+↓
+Visual / spatial experience</pre>
+
+            <p>
+                I am particularly interested in how generative systems, morphogenesis, procedural geometry, and interaction can extend this work beyond screen-based animation into shared physical or spatial experiences.
+            </p>
+
+            <p>
+                This is the direction I hope to develop further through the <strong>Architectural Computation MSc at UCL</strong>, particularly through areas such as <strong>Computational Synthesis, Morphogenetic Programming, and Digital Ecologies</strong>.
+            </p>
+        </section>
+
+        <section>
+            <h2>References and influences</h2>
+            <ul>
+                <li><a href="https://www.dspguide.com/pdfbook.htm">The Scientist and Engineer's Guide to Digital Signal Processing</a></li>
+                <li><a href="https://iquilezles.org/articles/gradientnoise/">Inigo Quilez — Gradient Noise</a></li>
+                <li><a href="https://iquilezles.org/articles/fbm/">Inigo Quilez — Fractal Brownian Motion</a></li>
+                <li><a href="https://algorithmicbotany.org/papers/#abop">The Algorithmic Beauty of Plants</a></li>
+                <li><a href="https://algorithmicbotany.org/papers/lsfp.pdf">Lindenmayer Systems, Fractals, and Plants</a></li>
+                <li><a href="https://dl.acm.org/doi/10.1145/280814.280948">Computer-Generated Floral Ornament</a></li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Technical context</h2>
+            <p>The current experiments are primarily built with:</p>
+            <ul>
+                <li>Swift / SwiftUI</li>
+                <li>Metal fragment shaders</li>
+                <li>Signed Distance Fields</li>
+                <li>Procedural gradient noise, FBM, and domain warping</li>
+                <li>Signal filtering and interpolation</li>
+                <li>Deterministic procedural generation</li>
+            </ul>
+            <p>
+                The project is intentionally developed at a low level so that I can understand the underlying computational techniques rather than relying primarily on high-level visual frameworks.
+            </p>
+        </section>
+
+        <section>
+            <h2>Source code</h2>
+            <ul>
+                <li><a href="https://github.com/runi">Runi — running visualisation proof-of-concept exploration</a></li>
+                <li><a href="https://github.com/sdf-playground">SDF exploration</a></li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <hr />
+        <h2>About</h2>
+        <p><strong>Daniel Tombor</strong><br />Software Engineer / Computational Design Applicant</p>
+        <p>
+            <a href="mailto:daniel@tmbe.me">Email</a><br />
+            <a href="https://tmbr.me">Personal blog</a>
+        </p>
+    </footer>
+</body>
+</html>
