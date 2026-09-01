@@ -40,6 +40,34 @@
             opacity: 0.9;
             padding: 0em 1.5em 1em 1.5em;
         }
+        
+        table {
+            background: #f9f9f9;
+            border-radius: 12px;
+            padding: 6px;
+            margin: 20px 0px;
+        }
+        
+        table > thead th {
+            background: #f9f9f9;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        table > thead th:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+        
+        table > thead th:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+        
+        table td {
+            padding: 4px 6px;
+        }
+        
     </style>
 </head>
 <body>
@@ -75,7 +103,7 @@
             </p>
 
             <p>
-                As an initial exploration, I compared different approaches to reconstructing and smoothing the signal. Catmull–Rom interpolation was used to generate continuous values between samples, while Gaussian smoothing and moving averages were tested as filtering methods for reducing short-term noise and spikes.
+                As an initial exploration, I compared different approaches to reconstructing and smoothing the signal. Catmull–Rom interpolation was used to generate continuous values between samples, while Gaussian smoothing and wave sampling were tested as filtering methods for reducing short-term noise and spikes.
             </p>
 
             <div class="media-grid">
@@ -116,7 +144,7 @@
             </div>
 
             <p>
-            The goal of signal analysis is not simply to make the data visually cleaner. The amount of smoothing is determined by the intended output: a long physical activity compressed into a short animation. Different interpolation and filtering configurations can produce very different visual behaviours. Smoothing the signal too aggressively can remove not only anomalies but also meaningful characteristics of the run. The aim is therefore to reduce distracting short-term noise while preserving changes that matter to the final visualisation.
+            The goal of signal analysis is not simply to make the data visually cleaner. The amount of smoothing is determined by the output feasable for a short animation. Different interpolation and filtering configurations can produce very different visual behaviours. Smoothing the signal too aggressively can remove not only anomalies but also meaningful characteristics of the run. The aim is therefore to reduce distracting short-term noise while preserving changes that matter to the final visualisation.
             </p>
 
             <div class="media-grid">
@@ -137,7 +165,7 @@
             <h3>Perception engine</h3>
 
             <p>
-                A typical run may last from several minutes to several hours, while the final visualisation is intended to be around <strong>15–60 seconds long</strong>. Directly mapping raw sample-to-sample changes into animation parameters would therefore exaggerate short-term fluctuations. Even an easy, steady run could produce rapid, flashy, and visually unstable motion. The processed signal should avoid this while preserving meaningful transitions once the run is compressed in time.
+                A typical run may last from several minutes to several hours, while the final visualisation is intended to be around <strong>15–60 seconds long</strong>. Directly mapping raw sample-to-sample changes into animation parameters would exaggerate short-term fluctuations. Even an easy, steady run could produce rapid, flashy, and visually unstable motion. The processed signal should avoid this while preserving meaningful transitions once the run is compressed in time.
             </p>
 
             <p>
@@ -205,23 +233,22 @@ Animation</pre>
             </div>
 
             <p>
-                <a href="https://iquilezles.org/articles/fbm/">Fractal Brownian Motion</a> builds on noise by combining several layers at different frequencies. This produces richer structures with detail at multiple scales. Changing frequency, amplitude, octave count, and persistence affects the perceived energy and complexity of the visual field.
+                <a href="https://iquilezles.org/articles/fbm/">Fractional Brownian Motion</a> builds on noise by combining several layers at different frequencies. This produces richer structures with detail at multiple scales. Changing frequency, amplitude, octave count, and persistence affects the perceived energy and complexity of the visual field.
             </p>
 
             <div class="media-grid">
                 <figure>
-                    <img src="resources/fbm-smooth.png" alt="Fractal Brownian Motion with fewer octaves and lower frequency" />
-                    <figcaption>Fractal Brownian Motion with fewer octaves and lower frequency</figcaption>
+                    <img src="resources/fbm-smooth.png" alt="Fractional Brownian Motion with fewer octaves and lower frequency" />
+                    <figcaption>Fractional Brownian Motion with fewer octaves and lower frequency</figcaption>
                 </figure>
                 <figure>
-                    <img src="resources/fbm-detailed.png" alt="Fractal Brownian Motion with more octaves and higher frequency" />
-                    <figcaption>Fractal Brownian Motion with more octaves and higher frequency</figcaption>
+                    <img src="resources/fbm-detailed.png" alt="Fractional Brownian Motion with more octaves and higher frequency" />
+                    <figcaption>Fractional Brownian Motion with more octaves and higher frequency</figcaption>
                 </figure>
             </div>
 
             <p>
-                The next step was using domain warping to distort the coordinates used to sample another procedural field. Instead of adding detail directly, domain warping bends and reshapes the underlying space. Connecting different running metrics to the warping, for example speed to amplitude, HR to octave count, and direction to sampling displacement, became particularly interesting because distortion itself could be used as a visual representation of effort, instability, or changing perception
-                during a run.
+                The next step was using <a href="https://iquilezles.org/articles/warp/">domain warping</a> to distort the coordinates used to sample another procedural field. Instead of adding detail directly, domain warping bends and reshapes the underlying space. Connecting different running metrics to the warping, for example speed to amplitude, HR to octave count, and direction to sampling displacement, became particularly interesting because distortion itself could be used as a visual representation of effort, instability, or changing perception during a run.
             </p>
 
             <div class="media-grid">
@@ -249,7 +276,7 @@ Animation</pre>
             <h3>Distorting geographic space</h3>
 
             <p>
-                To make the visualisation more immediately relatable, I applied domain warping to one of the most recognisable representations of a run: the route itself. A running map tells us where the athlete went, but not what the journey felt like. The experiment investigates whether the route can become part of the expressive visual system rather than remaining a neutral geographic trace.
+                To make the visualisation more immediately relatable, I applied domain warping to the route, the most recognisable representations of a run. A running map tells us where the athlete went, but not what the journey felt like. The experiment investigates whether the route can become part of the expressive visual system rather than remaining a neutral geographic trace.
             </p>
 
             <figure>
@@ -268,7 +295,7 @@ Animation</pre>
             <h2>Emerging botanical forms</h2>
 
             <p>
-                I would like to find a balance between representations that are highly abstract, such as a distorted noise field, and those that are immediately obvious, such as a distorted run path. A blooming flower or developing plant offers a possible middle ground.
+                Personally I would love to find a balance between representations that are highly abstract, such as a distorted noise field, and those that are immediately obvious, such as a distorted run path. A blooming flower or developing plant offers a methapor and possible middle ground.
             </p>
 
             <p>
@@ -330,7 +357,7 @@ Animation</pre>
             <h2>Hungarian Kalocsai ornament as a generative system</h2>
 
             <p>
-                The next investigation moves from natural botanical form to a cultural interpretation of flowers. Traditional <strong>Kalocsai embroidery</strong> uses stylised flowers, leaves, branches, repetition, colour, and ornamental hierarchy. The individual flower motifs are comparatively simple to represent using SDFs; the more interesting challenge is how to generate the larger ornamental composition, including branching, placement, and overlap.
+                The next investigation moves from natural botanical form to a cultural interpretation of flowers. Traditional <strong>Kalocsai embroidery</strong> uses stylised flowers, leaves, branches, repetition, colour, and ornamental hierarchy. The individual flower motifs are comparatively simple to represent using SDFs; the more interesting challenge is how to generate the larger ornamental composition, including branching and placement without overlaps.
             </p>
 
             <div class="media-grid">
@@ -412,7 +439,8 @@ Visual / spatial experience</pre>
             <ul>
                 <li><a href="https://www.dspguide.com/pdfbook.htm">The Scientist and Engineer's Guide to Digital Signal Processing</a></li>
                 <li><a href="https://iquilezles.org/articles/gradientnoise/">Inigo Quilez — Gradient Noise</a></li>
-                <li><a href="https://iquilezles.org/articles/fbm/">Inigo Quilez — Fractal Brownian Motion</a></li>
+                <li><a href="https://iquilezles.org/articles/fbm/">Inigo Quilez — Fractional Brownian Motion</a></li>
+                <li><a href="https://iquilezles.org/articles/warp/">Inigo Quilez — Domain Warping</a></li>
                 <li><a href="https://algorithmicbotany.org/papers/#abop">The Algorithmic Beauty of Plants</a></li>
                 <li><a href="https://algorithmicbotany.org/papers/lsfp.pdf">Lindenmayer Systems, Fractals, and Plants</a></li>
                 <li><a href="https://dl.acm.org/doi/10.1145/280814.280948">Computer-Generated Floral Ornament</a></li>
